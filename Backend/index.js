@@ -1,14 +1,28 @@
 const express = require('express')
 const app = express()
+const bodyParser = require("body-parser")
 const fs = require('fs')
+
+//CORS Headers
+app.use(function(req, res, next) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Allow-Credentials', true);
+    next();
+});
+
 const port = 8080
 
 var images = []
 
 
 app.post('/upload' , (req, res) => {
+
+    //console.log(req)
+
     //convert image to base64 Buffer
-    var base64 = fs.readFileSync(req.body.image, "base64");
+    var base64 = fs.readFileSync(req.body.file, "base64");
     var buffer = Buffer.from(base64, "base64");
     
     images[images.length] = buffer

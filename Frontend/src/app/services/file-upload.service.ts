@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpRequest, HttpEvent } from '@angular/common/http';
+import { HttpClient, HttpRequest, HttpEvent, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -8,17 +8,16 @@ import { Observable } from 'rxjs';
 export class UploadFilesService {
   private baseUrl = 'http://localhost:8080'; //set sanitization access here
 
+
+
   constructor(private http: HttpClient) { }
 
   upload(file: File): Observable<HttpEvent<any>> {
-    const formData: FormData = new FormData();
 
-    formData.append('file', file);
 
-    const req = new HttpRequest('POST', `${this.baseUrl}/upload`, formData, {
-      reportProgress: true,
-      responseType: 'json'
-    });
+    const req = new HttpRequest('POST', `${this.baseUrl}/upload`, file, { headers: new HttpHeaders({'Content-Type':'image/jpg'})});
+    console.log(req.body)
+    console.log(req)
 
     return this.http.request(req);
   }
