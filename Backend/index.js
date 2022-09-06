@@ -17,12 +17,12 @@ const port = 8080
 var images = []
 
 
-app.post('/upload' , (req, res) => {
+app.post('/upload' , bodyParser.raw({ type: ['image/jpeg', 'image/png'], limit: '5mb' }), (req, res) => {
 
-    //console.log(req)
+    console.log(req.body)
 
     //convert image to base64 Buffer
-    var base64 = fs.readFileSync(req.body.file, "base64");
+    var base64 = fs.readFileSync(req.body, "base64");
     var buffer = Buffer.from(base64, "base64");
     
     images[images.length] = buffer
