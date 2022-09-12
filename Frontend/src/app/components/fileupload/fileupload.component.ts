@@ -61,6 +61,9 @@ export class FileuploadComponent implements OnInit {
           });
 
       }
+      else {
+        this.message = file != null ? "File is too big" : "no File selected"
+      }
 
       this.selectedFiles = undefined;
     }
