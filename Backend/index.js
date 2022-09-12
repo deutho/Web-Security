@@ -1,9 +1,11 @@
 const express = require('express')
 const app = express()
 const bodyParser = require("body-parser")
-const fs = require('fs')
 const multer = require('multer')
 
+const port = 8080
+let upload = multer()
+var images = []
 
 //CORS Headers
 app.use(function(req, res, next) {
@@ -14,14 +16,11 @@ app.use(function(req, res, next) {
     next();
 });
 
-
+//Parse the Request Body
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json())
 
-const port = 8080
 
-var images = []
-let upload = multer()
 
 app.post('/upload', upload.single('file'), async (req, res) => {
     res.setHeader('Content-Type', 'application/json')
