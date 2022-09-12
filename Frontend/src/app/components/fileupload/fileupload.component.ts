@@ -14,6 +14,7 @@ export class FileuploadComponent implements OnInit {
   currentFile?: File;
   progress = 0;
   message = '';
+  showSuccess = false;
   // Maximum file size allowed to be uploaded = 1MB
   MAX_SIZE: number = 1048576;
 
@@ -46,6 +47,18 @@ export class FileuploadComponent implements OnInit {
               this.message = event.body.message;
               this.fileInfos = this.uploadService.getFiles();
             }
+            if(this.progress == 100) {
+              //show 100% for 2 sec, then show green success message
+              setTimeout(() => {
+                this.currentFile = undefined;
+                this.showSuccess = true;
+              }, 1000);
+              //show green success message
+              setTimeout(() => {
+                this.showSuccess = false;
+              }, 3000);
+            }
+
           },
           (err: any) => {
             console.log(err);
