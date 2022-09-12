@@ -32,8 +32,9 @@ app.post('/upload', upload.single('file'), (req, res) => {
     
     // images[images.length] = buffer
 
-    res.send("Image converted to base64 and stored")
-
+    res.setHeader('Content-Type', 'application/json')
+    res.status(200)
+    res.end(JSON.stringify({status:'success'}))
 })
 
 app.get('/files', (req, res) => {

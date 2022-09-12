@@ -12,19 +12,14 @@ export class UploadFilesService {
 
   upload(file: File): Observable<HttpEvent<any>> {
 
-    console.log(file)
 
     const formdata: FormData = new FormData();
-
     formdata.append('file', file);
 
     const req = new HttpRequest('POST', `${this.baseUrl}/upload`, formdata, {
       // headers: new HttpHeaders({'Content-Type': 'multipart/form-data'}),
       reportProgress: true,
       responseType: 'json'});
-
-
-    console.log(req.body?.get('file'))
 
     return this.http.request(req);
   }
