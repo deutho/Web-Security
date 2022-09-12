@@ -20,10 +20,15 @@ export class FileuploadComponent implements OnInit {
 
   fileInfos?: Observable<any>;
 
+  image: string = ""
   constructor(private uploadService: UploadFilesService) { }
 
   ngOnInit(): void {
     this.fileInfos = this.uploadService.getFiles();
+    this.fileInfos.subscribe(files => {
+      this.image = files[0]
+
+    })
   }
 
   selectFile(event: any): void {

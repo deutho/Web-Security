@@ -34,11 +34,17 @@ app.post('/upload', upload.single('file'), (req, res) => {
     else {
     
 
-        //convert image to base64 Buffer
-        // var base64 = fs.readFileSync(req.file, "base64");
-        // var buffer = Buffer.from(base64, "base64");
-        
-        // images[images.length] = buffer
+        //convert image to base64 from image buffer
+        var base64 = Buffer.from(req.file.buffer).toString("base64")
+        console.log(base64)
+
+        //convert to ascii and store the image
+        var ascii = Buffer.from(base64, "base64").toString("ascii")
+        console.log(ascii)
+
+        images[images.length] = ascii
+
+        console.log(images)
 
         res.setHeader('Content-Type', 'application/json')
         res.status(200)
