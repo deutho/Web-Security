@@ -8,8 +8,6 @@ import { Observable } from 'rxjs';
 export class UploadFilesService {
   private baseUrl = 'http://localhost:8080'; //set sanitization access here
 
-
-
   constructor(private http: HttpClient) { }
 
   upload(file: File): Observable<HttpEvent<any>> {

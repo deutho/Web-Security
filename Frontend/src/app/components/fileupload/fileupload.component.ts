@@ -14,6 +14,8 @@ export class FileuploadComponent implements OnInit {
   currentFile?: File;
   progress = 0;
   message = '';
+  // Maximum file size allowed to be uploaded = 1MB
+  MAX_SIZE: number = 1048576;
 
   fileInfos?: Observable<any>;
 
@@ -33,7 +35,7 @@ export class FileuploadComponent implements OnInit {
     if (this.selectedFiles) {
       const file: File | null = this.selectedFiles.item(0);
 
-      if (file) {
+      if (file && file.size < this.MAX_SIZE) {
         this.currentFile = file;
 
         this.uploadService.upload(this.currentFile).subscribe(
