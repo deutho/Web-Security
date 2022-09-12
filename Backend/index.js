@@ -3,7 +3,7 @@ const app = express()
 const bodyParser = require("body-parser")
 const fs = require('fs')
 const multer = require('multer')
-const { resourceLimits } = require('worker_threads')
+
 
 //CORS Headers
 app.use(function(req, res, next) {
@@ -23,7 +23,7 @@ const port = 8080
 var images = []
 let upload = multer()
 
-app.post('/upload', upload.single('file'), (req, res) => {
+app.post('/upload', upload.single('file'), async (req, res) => {
     res.setHeader('Content-Type', 'application/json')
 
     console.log(req.file.originalname)
@@ -33,22 +33,22 @@ app.post('/upload', upload.single('file'), (req, res) => {
     }
     else {
     
-
         //convert image to base64 from image buffer
         var base64 = Buffer.from(req.file.buffer).toString("base64")
-        console.log(base64)
+        
+        //check for multiple encodings to hide attack payload
+        if (base64.substring(0,4) !== "Vm0wd") {
 
-        //convert to ascii and store the image
-        var ascii = Buffer.from(base64, "base64").toString("ascii")
-        console.log(ascii)
+            images[images.length] = base64
 
-        images[images.length] = ascii
+            res.setHeader('Content-Type', 'application/json')
+            res.status(200)
+            res.end(JSON.stringify({status:'success'}))
 
-        console.log(images)
-
-        res.setHeader('Content-Type', 'application/json')
-        res.status(200)
-        res.end(JSON.stringify({status:'success'}))
+        } else {
+            res.status(400)
+            res.end(JSON.stringify({status:'error'}))
+        } 
     }
 })
 

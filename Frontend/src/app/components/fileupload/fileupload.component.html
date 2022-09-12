@@ -34,8 +34,7 @@
       *ngFor="let file of fileInfos | async"
     >
       <li class="list-group-item">
-        <a href="{{ file.url }}">{{ file.name }}</a>
-        <img src="{{image}}" alt="">
+        <img style = "width: 100%; border-radius: 10px;" src="{{'data:image/jpg;base64,' + file}}" />
       </li>
     </ul>
   </div>
