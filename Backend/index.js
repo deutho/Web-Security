@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const bodyParser = require("body-parser")
 const fs = require('fs')
+const multer = require('multer')
 
 //CORS Headers
 app.use(function(req, res, next) {
@@ -12,20 +13,24 @@ app.use(function(req, res, next) {
     next();
 });
 
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json())
+
 const port = 8080
 
 var images = []
+let upload = multer()
 
-
-app.post('/upload' , bodyParser.raw({ type: ['image/jpeg', 'image/png'], limit: '5mb' }), (req, res) => {
-
-    console.log(req.body)
+app.post('/upload', upload.single('file'), (req, res) => {
+    console.log(req.file.originalname)
+    
 
     //convert image to base64 Buffer
-    var base64 = fs.readFileSync(req.body, "base64");
-    var buffer = Buffer.from(base64, "base64");
+    // var base64 = fs.readFileSync(req.file, "base64");
+    // var buffer = Buffer.from(base64, "base64");
     
-    images[images.length] = buffer
+    // images[images.length] = buffer
 
     res.send("Image converted to base64 and stored")
 
