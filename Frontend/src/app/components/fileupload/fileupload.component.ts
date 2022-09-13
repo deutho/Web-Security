@@ -14,9 +14,9 @@ export class FileuploadComponent implements OnInit {
   currentFile?: File;
   progress = 0;
   message = '';
-  showSuccess = false;
-  // Maximum file size allowed to be uploaded = 1MB
-  MAX_SIZE: number = 1048576;
+  successMessage = '';
+  errorMessage = '';
+  MAX_SIZE: number = 1048576;   // Maximum file size allowed to be uploaded = 1MB
 
   fileInfos?: Observable<any>;
 
@@ -31,56 +31,105 @@ export class FileuploadComponent implements OnInit {
     this.selectedFiles = event.target.files;
   }
 
-  upload(): void {
+  /* upload the selected File */
+  upload(){
     this.progress = 0;
 
     if (this.selectedFiles) {
+      //select only one file in case of multi file upload attempt
       const file: File | null = this.selectedFiles.item(0);
 
-      if (file && file.size < this.MAX_SIZE) {
+      /* check inputed file for validity */
+      if (file &&                                                         //check for null                                 
+          file.size < this.MAX_SIZE &&                                    //check max File Size (1MB)          
+          (file.type === "image/jpeg" || file.type === "image/jpeg") &&   //check for valid filetype (.jpg or .png)
+          !file.name.includes("/") &&                                     //check for propably malicious delimiters e.g. “/file.jpg/index.php”
+          !file.name.includes(";") &&                                     //check for propably malicious delimiters e.g. “file.asp;.jpg”
+          !(file.name.indexOf(".", file.name.indexOf(".")+1) != -1)&&     //check for double extension attack e.g. image.pdf.png
+          file.name.length < 34                                           //check if file name is reasonably short
+          ) {
         this.currentFile = file;
-
+        
+        //file seems legit on first inspection so start upload
         this.uploadService.upload(this.currentFile).subscribe(
           (event: any) => {
+            //just a Progress bar - now web security related but a nice UX
             if (event.type === HttpEventType.UploadProgress) {
               this.progress = Math.round(100 * event.loaded / event.total);
             } else if (event instanceof HttpResponse) {
               this.message = event.body.message;
               this.fileInfos = this.uploadService.getFiles();
             }
+            //when done uploading do:
             if(this.progress == 100) {
               //show 100% for 2 sec, then show green success message
               setTimeout(() => {
                 this.currentFile = undefined;
-                this.showSuccess = true;
               }, 1000);
               //show green success message
-              setTimeout(() => {
-                this.showSuccess = false;
-              }, 3000);
+              this.showMsg("Image successfully uploaded", "success")
             }
 
           },
           (err: any) => {
             console.log(err);
             this.progress = 0;
-
             if (err.error && err.error.message) {
               this.message = err.error.message;
             } else {
-              this.message = 'Could not upload the file!';
+              this.showMsg('Could not upload the file!', "error");
             }
-
             this.currentFile = undefined;
           });
-
       }
       else {
-        this.message = file != null ? "File is too big" : "no File selected"
+        //error messages according to detected error
+        if (file != null) {
+          file.size < this.MAX_SIZE ? '' : this.showMsg("selected File is too big", "error");
+          (file.type === "image/jpeg" || file.type === "image/jpeg") ? '' : this.showMsg("Not a valid Filetype - only .png and .jpg are accepted", "error");
+          !file.name.includes("/") ? '' : this.showMsg("Filename contains unallowed character: '/'", "error");
+          !file.name.includes(";") ? '' : this.showMsg("Filename contains unallowed character: ';'", "error");
+          !(file.name.indexOf(".", file.name.indexOf(".")+1) != -1) ? '' : this.showMsg("Filename contains too many type declarations: e.g. 'image.pdf.png'", "error");
+          file.name.length < 20 ? '' : this.showMsg("name of selected File is too long. Only 30 characters are allowed.", "error");
+        }
+        else this.showMsg("no File selected", "error")                                                                                
       }
-
       this.selectedFiles = undefined;
     }
   }
 
+  /* Messages for Usernotification */
+  showMsg(message: string, type: String){
+    //errormsg
+    if(type === "error") {
+      this.errorMessage = message;
+      setTimeout(() => {
+        this.errorMessage = ''
+      }, 5000);
+    }
+    //successmsg
+    else if(type === "success") {
+        this.successMessage = message;
+        setTimeout(() => {
+          this.successMessage = ''
+        }, 5000);
+    }
+    //defaultmsg
+    else{
+        this.message = message;
+        setTimeout(() => {
+          this.message = ''
+        }, 5000);
+    }    
+  }
 }
+
+
+
+
+/*
+- Backend auf Middleware umbenennen
+- tatsächliches Backend implementieren (posted Daten in DB, getted diese auch)
+- Alles Dockerizen (Dabei auch Mongo DB ziehen)
+- Weitere Attack arten suchen und recherchieren
+*/
