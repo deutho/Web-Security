@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  angularfrontend:
+    container_name: angularfrontend
+    build:
+      context: .
+      dockerfile: Dockerfile_Frontend
+    ports: 
+     - 4200:4200
+    command: ng serve --host=0.0.0.0
+  
+  nodebackend:
+    container_name: backend
+    build:
+      context: .
+      dockerfile: Dockerfile_Backend
+    networks:
+    - db_network
+    ports:
+    - 8080:8080
+    command: node index.js
+
+networks:
+  db_network:
+    driver: bridge

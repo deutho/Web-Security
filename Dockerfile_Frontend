@@ -1,0 +1,17 @@
+FROM node:latest as build
+
+WORKDIR /usr/local/app
+
+COPY ./Frontend .
+
+RUN npm install -g @angular/cli
+
+RUN npm install
+
+# RUN npm run build
+
+# FROM nginx:latest
+
+# COPY --from=build /usr/local/app/dist/web-security-topic22 /usr/share/nginx/html
+
+EXPOSE 4200
