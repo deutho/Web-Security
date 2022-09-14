@@ -1,6 +1,9 @@
 const express = require('express')
 const app = express()
+const mongoose = require("mongoose")
 const bodyParser = require("body-parser")
+
+const MongoDB_URI = "mongodb://websecurity:secure_password!@mongodb:27017"
 
 const port = 8081
 
@@ -16,6 +19,18 @@ app.use(function(req, res, next) {
 //Parse the Request Body
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json())
+
+
+//Connect to the Database
+mongoose.connect(
+    MongoDB_URI, 
+    {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    }).then(
+        () => { console.log("Connected to Database")},
+        err => { console.log("Error connecting to database", err)}
+    );
 
 
 
