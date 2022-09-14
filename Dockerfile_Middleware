@@ -1,0 +1,7 @@
+FROM node:latest
+
+WORKDIR /usr/scr/app
+COPY ./Middleware/package*.json ./
+RUN npm install
+COPY ./Middleware .
+EXPOSE 8080
