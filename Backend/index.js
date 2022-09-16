@@ -26,6 +26,15 @@ app.use(bodyParser.urlencoded({limit: '5mb', extended: true }));
 
 //Connect to the Database
 
+//build schema for DB and set Model
+this.schema = mongoose.Schema({
+    "name": String,
+    "timeStamp": Number,
+    "image": String
+    });
+const Model = mongoose.model("model", this.schema, "images");
+
+
 mongoose.connect(
     MongoDB_URI, 
     {
@@ -33,12 +42,7 @@ mongoose.connect(
         useUnifiedTopology: true
     }).then(
         () => { 
-            //build schema for DB
-            this.schema = mongoose.Schema({
-            "name": String,
-            "timeStamp": Number,
-            "image": String
-            });
+
 
             this.db = mongoose.connection;
             //report successfull start
@@ -54,10 +58,10 @@ app.listen(port, () => {
     console.log('Backend started!')
 })
 
-app.get('/files', (req, res) => {
+app.get('/files', async (req, res) => {
     //get all files and send them
     
-    res.send(this.db.images.find())
+    res.send(JSON.stringify(await Model.find()))
 })
 
 app.post('/upload', async (req, res) => {
@@ -75,14 +79,13 @@ app.post('/upload', async (req, res) => {
         filename = req.body.filename
 
 
-        var Model = mongoose.model("model", this.schema, "images");
-
+        
         image_doc = new Model({
             "name": filename,
-            "time": Date.now(),
+            "timeStamp": Date.now(),
             "image": body
         })
-
+        console.log(image_doc)
         
         image_doc.save((err, doc) => {
             if (err) return console.error(err);
