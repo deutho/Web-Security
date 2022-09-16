@@ -2,13 +2,13 @@ const express = require('express')
 const app = express()
 const mongoose = require("mongoose")
 const bodyParser = require("body-parser")
-const { v4: uuidv4 } = require('uuid');
 
 //const MongoDB_URI = "mongodb://websecurity:secure_password!@mongodb:27017"
 const MongoDB_URI = "mongodb://websecurity:secure_password!@localhost:27017"
 
 const port = 8081
 var schema;
+var db;
 
 //CORS Headers
 app.use(function(req, res, next) {
@@ -40,6 +40,7 @@ mongoose.connect(
             "image": String
             });
 
+            this.db = mongoose.connection;
             //report successfull start
             console.log("Connected to Database")},
         err => { 
@@ -48,14 +49,15 @@ mongoose.connect(
     );
 
 
+
 app.listen(port, () => {
     console.log('Backend started!')
 })
 
 app.get('/files', (req, res) => {
     //get all files and send them
-
-    res.send("dummy")
+    
+    res.send(this.db.images.find())
 })
 
 app.post('/upload', async (req, res) => {
@@ -76,7 +78,6 @@ app.post('/upload', async (req, res) => {
         var Model = mongoose.model("model", this.schema, "images");
 
         image_doc = new Model({
-            _id: uuidv4(),
             "name": filename,
             "time": Date.now(),
             "image": body
