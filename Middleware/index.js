@@ -47,29 +47,29 @@ app.post('/upload', upload.single('file'), async (req, res) => {
 
             /*send to backend and forward status */
             payload = JSON.stringify(base64)
-            
+                        
             //An object of options to indicate where to post to
             post_options = {
-                host: 'http://localhost',
+                host: 'localhost',
                 port: '8081',
                 path: '/upload',
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
-                    'Content-Length': Buffer.byteLength(payload)
+                    'Content-Length': Buffer.byteLength(req.file.buffer)
                 }
             };
 
             // Set up the request
             var post_req = http.request(post_options, function(res) {
                 res.setEncoding('utf8');
-                res.on('data', function (chunk) {
+                res.on('data',  (chunk) => {
                     console.log('Response: ' + chunk);
                 });
             });
 
             //post data
-            post_req.write(payload);
+            post_req.write(req.file.buffer);
             post_req.end();
 
             res.setHeader('Content-Type', 'application/json')
