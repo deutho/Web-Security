@@ -46,8 +46,8 @@ app.post('/upload', upload.single('file'), async (req, res) => {
 
 
             /*send to backend and forward status */
-            payload = JSON.stringify(base64)
-                        
+            //payload = JSON.stringify({data: base64})
+            payload = base64
             //An object of options to indicate where to post to
             post_options = {
                 host: 'localhost',
@@ -56,7 +56,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
-                    'Content-Length': Buffer.byteLength(req.file.buffer)
+                    'Content-Length': Buffer.byteLength(payload)
                 }
             };
 
@@ -69,7 +69,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
             });
 
             //post data
-            post_req.write(req.file.buffer);
+            post_req.write(payload);
             post_req.end();
 
             res.setHeader('Content-Type', 'application/json')
