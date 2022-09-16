@@ -22,7 +22,7 @@ app.use(bodyParser.json())
 
 
 //Connect to the Database
-/*
+
 mongoose.connect(
     MongoDB_URI, 
     {
@@ -31,7 +31,7 @@ mongoose.connect(
     }).then(
         () => { console.log("Connected to Database")},
         err => { console.log("Error connecting to database", err)}
-    );*/
+    );
 
 
 app.listen(port, () => {
