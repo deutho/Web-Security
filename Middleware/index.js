@@ -3,6 +3,10 @@ const app = express()
 const bodyParser = require("body-parser")
 const multer = require('multer')
 
+var querystring = require('querystring');
+var http = require('http');
+var fs = require('fs');
+
 const port = 8080
 let upload = multer()
 var images = []
@@ -38,7 +42,35 @@ app.post('/upload', upload.single('file'), async (req, res) => {
         //check for multiple encodings to hide attack payload
         if (base64.substring(0,4) !== "Vm0wd") {
 
-            images[images.length] = base64
+            //images[images.length] = base64
+
+
+            /*send to backend and forward status */
+            payload = JSON.stringify(base64)
+            
+            //An object of options to indicate where to post to
+            post_options = {
+                host: 'http://localhost',
+                port: '8081',
+                path: '/upload',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Content-Length': Buffer.byteLength(payload)
+                }
+            };
+
+            // Set up the request
+            var post_req = http.request(post_options, function(res) {
+                res.setEncoding('utf8');
+                res.on('data', function (chunk) {
+                    console.log('Response: ' + chunk);
+                });
+            });
+
+            //post data
+            post_req.write(payload);
+            post_req.end();
 
             res.setHeader('Content-Type', 'application/json')
             res.status(200)
@@ -49,10 +81,6 @@ app.post('/upload', upload.single('file'), async (req, res) => {
             res.end(JSON.stringify({status:'error'}))
         } 
     }
-})
-
-app.get('/files', (req, res) => {
-    res.send(images)
 })
 
 

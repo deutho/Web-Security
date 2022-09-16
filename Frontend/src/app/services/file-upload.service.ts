@@ -6,7 +6,8 @@ import { map, Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class UploadFilesService {
-  private baseUrl = 'http://localhost:8080'; //set sanitization access here
+  private middlewareUrl = 'http://localhost:8080'; //set sanitization access here
+  private backendURL = 'http://localhost:8081'; //set sanitization access here
 
   constructor(private http: HttpClient) { }
 
@@ -16,7 +17,7 @@ export class UploadFilesService {
     const formdata: FormData = new FormData();
     formdata.append('file', file);
 
-    const req = new HttpRequest('POST', `${this.baseUrl}/upload`, formdata, {
+    const req = new HttpRequest('POST', `${this.middlewareUrl}/upload`, formdata, {
       // headers: new HttpHeaders({'Content-Type': 'multipart/form-data'}),
       reportProgress: true,
       responseType: 'json'});
@@ -25,6 +26,6 @@ export class UploadFilesService {
   }
 
   getFiles(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/files`);
+    return this.http.get(`${this.backendURL}/files`);
   }
 }

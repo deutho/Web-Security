@@ -22,6 +22,7 @@ app.use(bodyParser.json())
 
 
 //Connect to the Database
+/*
 mongoose.connect(
     MongoDB_URI, 
     {
@@ -30,10 +31,49 @@ mongoose.connect(
     }).then(
         () => { console.log("Connected to Database")},
         err => { console.log("Error connecting to database", err)}
-    );
-
+    );*/
 
 
 app.listen(port, () => {
     console.log('Backend started!')
+})
+
+app.get('/files', (req, res) => {
+    //get all files and send them
+
+    res.send("dummy")
+})
+
+app.post('/upload', async (req, res) => {
+    res.setHeader('Content-Type', 'application/json')
+    console.log(req);
+
+    console.log(req.file.originalname)
+    if (req.file == undefined && req.file == {}) {
+        res.status(400)
+        res.end(JSON.stringify({status:'error'}))
+    }
+    else {
+        //store to mongoDB and send success
+        
+
+
+
+
+        /*
+        //check for multiple encodings to hide attack payload
+        if (base64.substring(0,4) !== "Vm0wd") {
+
+            images[images.length] = base64
+            //send to backend and forward status
+
+            res.setHeader('Content-Type', 'application/json')
+            res.status(200)
+            res.end(JSON.stringify({status:'success'}))
+
+        } else {
+            res.status(400)
+            res.end(JSON.stringify({status:'error'}))
+        } */
+    }
 })
