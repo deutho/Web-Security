@@ -52,8 +52,6 @@ mongoose.connect(
         }
     );
 
-
-
 app.listen(port, () => {
     console.log('Backend started!')
 })

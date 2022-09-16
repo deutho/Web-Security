@@ -42,11 +42,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
         //check for multiple encodings to hide attack payload
         if (base64.substring(0,4) !== "Vm0wd") {
 
-            //images[images.length] = base64
-
-
             /*send to backend and forward status */
-            //payload = JSON.stringify({data: base64})
             payload = JSON.stringify({data: base64, filename: req.file.originalname})
             //An object of options to indicate where to post to
             post_options = {
