@@ -70,12 +70,14 @@ app.post('/upload', async (req, res) => {
     else {
         //store to mongoDB and send success
         body = req.body.data
+        filename = req.body.filename
 
 
-        var Model = mongoose.model("model", this.schema, "myCollection");
+        var Model = mongoose.model("model", this.schema, "images");
 
         image_doc = new Model({
-            "name": uuidv4(),
+            _id: uuidv4(),
+            "name": filename,
             "time": Date.now(),
             "image": body
         })
