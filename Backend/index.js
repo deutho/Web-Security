@@ -18,9 +18,9 @@ app.use(function(req, res, next) {
 });
 
 //Parse the Request Body
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json())
 
+app.use(bodyParser.json({limit: '5mb'}))
+app.use(bodyParser.urlencoded({limit: '5mb', extended: true }));
 
 //Connect to the Database
 
@@ -49,7 +49,6 @@ app.post('/upload', async (req, res) => {
     res.setHeader('Content-Type', 'application/json')
     console.log(req);
 
-    console.log(req.file.originalname)
     if (req.file == undefined && req.file == {}) {
         res.status(400)
         res.end(JSON.stringify({status:'error'}))
@@ -57,6 +56,7 @@ app.post('/upload', async (req, res) => {
     else {
         //store to mongoDB and send success
         
+        console.log("no error so far")
 
 
 
