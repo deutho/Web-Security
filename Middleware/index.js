@@ -48,7 +48,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
                 payload = JSON.stringify({data: base64, filename: req.file.originalname})
                 //An object of options to indicate where to post to
                 post_options = {
-                    host: 'localhost',
+                    host: 'nodebackend',
                     port: '8081',
                     path: '/upload',
                     method: 'POST',

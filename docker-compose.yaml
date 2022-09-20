@@ -14,8 +14,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile_Middleware
-    # networks:
-    # - db_network
+    networks:
+    - db_network
     ports:
     - 8080:8080
     command: node index.js

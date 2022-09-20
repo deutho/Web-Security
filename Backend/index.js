@@ -3,8 +3,8 @@ const app = express()
 const mongoose = require("mongoose")
 const bodyParser = require("body-parser")
 
-//const MongoDB_URI = "mongodb://websecurity:secure_password!@mongodb:27017"
-const MongoDB_URI = "mongodb://websecurity:secure_password!@localhost:27017"
+const MongoDB_URI = "mongodb://websecurity:secure_password!@mongodb:27017"
+//const MongoDB_URI = "mongodb://websecurity:secure_password!@localhost:27017"
 
 const port = 8081
 var schema;
