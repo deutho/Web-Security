@@ -69,7 +69,7 @@ app.post('/upload', async (req, res) => {
 
     if (req.body == undefined || req.body == {}) {
         res.status(400)
-        res.end(JSON.stringify({status:'error'}))
+        res.end(JSON.stringify({status:'No File'}))
     }
     else {
         //store to mongoDB and send success
@@ -90,24 +90,5 @@ app.post('/upload', async (req, res) => {
             console.log("Document inserted succussfully!");
         })
 
-
-
-
-
-        /*
-        //check for multiple encodings to hide attack payload
-        if (base64.substring(0,4) !== "Vm0wd") {
-
-            images[images.length] = base64
-            //send to backend and forward status
-
-            res.setHeader('Content-Type', 'application/json')
-            res.status(200)
-            res.end(JSON.stringify({status:'success'}))
-
-        } else {
-            res.status(400)
-            res.end(JSON.stringify({status:'error'}))
-        } */
     }
 })
