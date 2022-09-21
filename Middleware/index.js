@@ -2,6 +2,8 @@ const express = require('express')
 const app = express()
 const bodyParser = require("body-parser")
 const multer = require('multer')
+const timeout = require('connect-timeout');
+
 
 var querystring = require('querystring');
 var http = require('http');
@@ -10,6 +12,8 @@ var fs = require('fs');
 const port = 8080
 let upload = multer()
 var images = []
+
+app.use(timeout('20s')); //set 20s timeout for all requests
 
 //CORS Headers
 app.use(function(req, res, next) {

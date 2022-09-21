@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const mongoose = require("mongoose")
 const bodyParser = require("body-parser")
+const timeout = require('connect-timeout');
 
 const MongoDB_URI = "mongodb://websecurity:secure_password!@mongodb:27017"
 //const MongoDB_URI = "mongodb://websecurity:secure_password!@localhost:27017"
@@ -9,6 +10,8 @@ const MongoDB_URI = "mongodb://websecurity:secure_password!@mongodb:27017"
 const port = 8081
 var schema;
 var db;
+
+app.use(timeout('20s')); //set 20s timeout for all requests
 
 //CORS Headers
 app.use(function(req, res, next) {
