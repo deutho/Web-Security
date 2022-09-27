@@ -15,10 +15,21 @@ app.use(timeout('20s')); //set 20s timeout for all requests
 
 //CORS Headers
 app.use(function(req, res, next) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    const corsWhiteList =  ['http://localhost:8080', 'http://localhost:4201']; //accepted origins --> Frontend and Middleware
+
+    if (corsWhiteList.includes(req.headers.origin))  { //origin has valid index in the whitelist array
+        res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
+        
+    } else {
+        res.setHeader('Access-Control-Allow-Origin', '');
+    }
+    
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     res.setHeader('Access-Control-Allow-Credentials', true);
+    
+    
     next();
 });
 
@@ -67,9 +78,7 @@ app.get('/files', async (req, res) => {
 
 app.post('/upload', async (req, res) => {
     res.setHeader('Content-Type', 'application/json')
-    //console.log(req);
-
-
+    
     if (req.body == undefined || req.body == {}) {
         res.status(400)
         res.end(JSON.stringify({status:'No File'}))
@@ -79,18 +88,16 @@ app.post('/upload', async (req, res) => {
         body = req.body.data
         filename = req.body.filename
 
-
-        
         image_doc = new Model({
             "name": filename,
             "timeStamp": Date.now(),
             "image": body
         })
-        console.log(image_doc)
         
         image_doc.save((err, doc) => {
             if (err) return console.error(err);
-            console.log("Document inserted succussfully!");
+            res.status(200)
+            res.end(JSON.stringify({status:'success'}))
         })
 
     }
