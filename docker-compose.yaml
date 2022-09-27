@@ -9,11 +9,11 @@ services:
      - 4200:4200
     command: ng serve --host=0.0.0.0
   
-  nodemiddleware:
-    container_name: nodemiddleware
+  nodesanitizingservice:
+    container_name: nodesanitizingservice
     build:
       context: .
-      dockerfile: Dockerfile_Middleware
+      dockerfile: Dockerfile_SanitizingService
     networks:
     - db_network
     ports:

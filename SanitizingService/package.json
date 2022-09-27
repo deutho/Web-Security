@@ -1,5 +1,5 @@
 {
-  "name": "middleware",
+  "name": "Sanitizing Service",
   "version": "1.0.0",
   "description": "Image Sanitizing API",
   "main": "index.js",
