@@ -4,8 +4,10 @@ const mongoose = require("mongoose")
 const bodyParser = require("body-parser")
 const timeout = require('connect-timeout');
 
-const MongoDB_URI = "mongodb://websecurity:secure_password!@mongodb:27017"
-//const MongoDB_URI = "mongodb://websecurity:secure_password!@localhost:27017"
+const username = process.env.DB_USERNAME
+const password = process.env.DB_PASSWORD
+
+const MongoDB_URI = "mongodb://"+username+":"+password+"@mongodb:27017"
 
 const port = 8081
 var schema;
@@ -16,13 +18,13 @@ app.use(timeout('20s')); //set 20s timeout for all requests
 //CORS Headers
 app.use(function(req, res, next) {
 
-    const corsWhiteList =  ['http://localhost:8080', 'http://localhost:4201']; //accepted origins --> Frontend and Middleware
+    const corsWhiteList =  ['http://localhost:8080', 'http://localhost:4200']; //accepted origins --> Frontend and Middleware
 
     if (corsWhiteList.includes(req.headers.origin))  { //origin has valid index in the whitelist array
-        res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
+        res.setHeader('Access-Control-Allow-Origin', req.headers.origin); //add URL to the Header
         
     } else {
-        res.setHeader('Access-Control-Allow-Origin', '');
+        res.setHeader('Access-Control-Allow-Origin', ''); //don't provide the CORS Origin Header
     }
     
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
