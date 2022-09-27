@@ -11,7 +11,6 @@ var fs = require('fs');
 
 const port = 8080
 let upload = multer()
-var images = []
 
 app.use(timeout('20s')); //set 20s timeout for all requests
 
@@ -40,7 +39,6 @@ app.post('/upload', upload.single('file'), async (req, res) => {
     }
     else {
     
-        
         try {
             //convert image to base64 from image buffer
             var base64 = Buffer.from(req.file.buffer).toString("base64")
@@ -88,7 +86,6 @@ app.post('/upload', upload.single('file'), async (req, res) => {
         }
     }
 })
-
 
 app.listen(port, () => {
     console.log('Middleware started!')
