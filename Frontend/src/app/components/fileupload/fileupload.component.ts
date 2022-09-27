@@ -123,13 +123,3 @@ export class FileuploadComponent implements OnInit {
     }    
   }
 }
-
-
-
-
-/*
-- Backend auf Middleware umbenennen
-- tatsächliches Backend implementieren (posted Daten in DB, getted diese auch)
-- Alles Dockerizen (Dabei auch Mongo DB ziehen)
-- Weitere Attack arten suchen und recherchieren
-*/

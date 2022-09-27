@@ -7,7 +7,7 @@ import { map, Observable } from 'rxjs';
 })
 export class UploadFilesService {
   private middlewareUrl = 'http://localhost:8080'; //set sanitization access here
-  private backendURL = 'http://localhost:8081'; //set sanitization access here
+  private backendURL = 'http://localhost:8081'; //set backend access here
 
   constructor(private http: HttpClient) { }
 
