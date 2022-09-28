@@ -8,6 +8,7 @@ services:
     ports: 
      - 4200:4200
     command: ng serve --host=0.0.0.0
+    restart: always
   
   nodesanitizingservice:
     container_name: nodesanitizingservice
@@ -19,6 +20,7 @@ services:
     ports:
     - 8080:8080
     command: node index.js
+    restart: always
 
   nodebackend:
     container_name: nodebackend
@@ -35,6 +37,8 @@ services:
     environment:
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
+    restart: always
+    
 
   mongodb:
     image: mongo:latest
@@ -47,6 +51,7 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=${DB_PASSWORD}
     ports:
       - 27017:27017
+    restart: always
 
 networks:
   db_network:
