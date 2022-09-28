@@ -12,6 +12,7 @@ const Jimp = require('jimp');
 
 const port = 8080
 let upload = multer()
+const MAX_SIZE = 1048576;   // Maximum file size allowed to be uploaded = 1MB
 
 app.use(timeout('20s')); //set 20s timeout for all requests
 
@@ -40,12 +41,29 @@ var image_magic_strings = {
 app.post('/sanitize', upload.single('file'), async (req, res) => {
     res.setHeader('Content-Type', 'application/json')
     
+
+
+
+
     if (req.file == undefined && req.file == {}) {
         res.status(400)
         res.end(JSON.stringify({status:'No File'}))
     }
     else {
-        
+        // first security checks - same as in frontend
+        if (req.file.size < MAX_SIZE &&                                                             //check max File Size (1MB)          
+            !req.file.originalname.includes("/") &&                                                 //check for propably malicious delimiters e.g. “/file.jpg/index.php”
+            !req.file.originalname.includes(";") &&                                                 //check for propably malicious delimiters e.g. “file.asp;.jpg”
+            !(req.file.originalname.indexOf(".", req.file.originalname.indexOf(".")+1) != -1)&&     //check for double extension attack e.g. image.pdf.png
+            req.file.originalname.length < 34                                                       //check if file name is reasonably short
+            ) {}
+        else {
+            res.status(400)
+            res.end(JSON.stringify({status:'File violates security measures'}))
+        }
+
+
+
         var is_jpg;
 
         //check for mime type with first bytes in hex encoding: https://stackoverflow.com/questions/8473703/in-node-js-given-a-url-how-do-i-check-whether-its-a-jpg-png-gif/8475542#8475542
@@ -61,6 +79,8 @@ app.post('/sanitize', upload.single('file'), async (req, res) => {
 
         if (is_jpg) {
 
+
+
             //von jpg zu png konvertieren
             jimp.read(req.file.buffer, function(err, image) {
                 if (err) {
@@ -68,16 +88,16 @@ app.post('/sanitize', upload.single('file'), async (req, res) => {
                     console.log(err)
                 }
                 else {
-                    image.write("./Test.png")
+                    image.write("image/test.png")
                   }
             })
 
 
                     
-            jimp.read("./Test.png", function(err, image_png) {
+            // jimp.read("image/test.png", function(err, image_png) {
                 if (err) {
                     //TODO Hier den richtigen Error werfen
-                    console.log(err)
+                    console.log("readerror: "+err)
                 }
                 else {
                     console.log(image_png)

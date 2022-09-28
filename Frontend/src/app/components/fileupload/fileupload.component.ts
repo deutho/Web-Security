@@ -60,13 +60,9 @@ export class FileuploadComponent implements OnInit {
               this.message = event.body.message;
               this.fileInfos = this.uploadService.getFiles();
             }
-            //when done uploading do:
+            //when done uploading clear file and show done message:
             if(this.progress == 100) {
-              //show 100% for 2 sec, then show green success message
-              setTimeout(() => {
-                this.currentFile = undefined;
-              }, 1000);
-              //show green success message
+              this.currentFile = undefined;
               this.showMsg("Image successfully uploaded", "success")
             }
 
@@ -74,8 +70,8 @@ export class FileuploadComponent implements OnInit {
           (err: any) => {
             console.log(err);
             this.progress = 0;
-            if (err.error && err.error.message) {
-              this.message = err.error.message;
+            if (err.error && err.error.status) {
+              this.showMsg(err.error.status, "error");
             } else {
               this.showMsg('Could not upload the file!', "error");
             }
@@ -90,7 +86,7 @@ export class FileuploadComponent implements OnInit {
           !file.name.includes("/") ? '' : this.showMsg("Filename contains unallowed character: '/'", "error");
           !file.name.includes(";") ? '' : this.showMsg("Filename contains unallowed character: ';'", "error");
           !(file.name.indexOf(".", file.name.indexOf(".")+1) != -1) ? '' : this.showMsg("Filename contains too many type declarations: e.g. 'image.pdf.png'", "error");
-          file.name.length < 20 ? '' : this.showMsg("name of selected File is too long. Only 30 characters are allowed.", "error");
+          file.name.length < 30 ? '' : this.showMsg("name of selected File is too long. Only 30 characters are allowed.", "error");
         }
         else this.showMsg("no File selected", "error")                                                                                
       }
@@ -103,6 +99,8 @@ export class FileuploadComponent implements OnInit {
     //errormsg
     if(type === "error") {
       this.errorMessage = message;
+      this.successMessage = '';
+      this.message = '';
       setTimeout(() => {
         this.errorMessage = ''
       }, 5000);
@@ -110,6 +108,8 @@ export class FileuploadComponent implements OnInit {
     //successmsg
     else if(type === "success") {
         this.successMessage = message;
+        this.errorMessage = '';
+        this.message = '';
         setTimeout(() => {
           this.successMessage = ''
         }, 5000);
@@ -117,6 +117,8 @@ export class FileuploadComponent implements OnInit {
     //defaultmsg
     else{
         this.message = message;
+        this.errorMessage = '';
+        this.successMessage = '';
         setTimeout(() => {
           this.message = ''
         }, 5000);
