@@ -3,9 +3,12 @@ const app = express()
 const bodyParser = require("body-parser")
 const multer = require('multer')
 const timeout = require('connect-timeout');
+const jimp = require('jimp')
+const axios = require('axios')
 
 
 var http = require('http');
+const Jimp = require('jimp');
 
 const port = 8080
 let upload = multer()
@@ -14,7 +17,7 @@ app.use(timeout('20s')); //set 20s timeout for all requests
 
 //CORS Headers
 app.use(function(req, res, next) {
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8081');
+    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
     res.setHeader('Access-Control-Allow-Methods', 'GET');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     res.setHeader('Access-Control-Allow-Credentials', true);
@@ -58,15 +61,38 @@ app.post('/sanitize', upload.single('file'), async (req, res) => {
         if (is_jpg) {
 
             //von jpg zu png konvertieren
+            jimp.read(req.file.buffer, (error, image) => {
+                if (error) {
+                    //TODO Hier den richtigen Error werfen
+                    console.log(error)
+                }
+                else {
+                    image.write("converted_images/"+req.file.originalname+".png", (error, image) => {
+                        if (error) {
+                            //TODO Hier den richtigen Error werfen
+                            console.log(error)
+                        }
+                        else {
+                            console.log(image)
+                            post_image(image, req.file.originalname, res)
+                        }
+                    })
+                }
+            })
+
         }
 
         else {
             //von png zu jpg konvertieren
         }
+    }
+});
 
+
+function post_image(image, filename, res) {
 
         //convert image to base64 from image buffer
-        var base64 = Buffer.from(req.file.buffer).toString("base64")
+        var base64 = Buffer.from(image.bitmap.data).toString("base64")
         
         //check for multiple encodings to hide attack payload
         if (base64.substring(0,4) !== "Vm0wd") {
@@ -74,7 +100,18 @@ app.post('/sanitize', upload.single('file'), async (req, res) => {
             //here send data to the frontend to store
 
             /*send to backend and forward status */
-            payload = JSON.stringify({data: base64, filename: req.file.originalname})
+            payload = JSON.stringify({data: base64, filename: filename})
+
+
+            // axios.post('http://localhost:8081/upload', payload).then(res => {
+
+            // })
+            // .catch(error => {
+            //     //TODO throw meaningful error
+            //     console.log(error);
+            // });
+
+
             //An object of options to indicate where to post to
             post_options = {
                 host: 'nodebackend',
@@ -108,8 +145,8 @@ app.post('/sanitize', upload.single('file'), async (req, res) => {
             res.end(JSON.stringify({status:'Unsecure Base64 String'}))
         } 
        
-    }
-})
+}
+
 
 app.listen(port, () => {
     console.log('Middleware started!')

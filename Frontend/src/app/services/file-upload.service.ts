@@ -17,7 +17,7 @@ export class UploadFilesService {
     const formdata: FormData = new FormData();
     formdata.append('file', file);
 
-    const req = new HttpRequest('POST', `${this.middlewareUrl}/upload`, formdata, {
+    const req = new HttpRequest('POST', `${this.middlewareUrl}/sanitize`, formdata, {
       // headers: new HttpHeaders({'Content-Type': 'multipart/form-data'}),
       reportProgress: true,
       responseType: 'json'});
