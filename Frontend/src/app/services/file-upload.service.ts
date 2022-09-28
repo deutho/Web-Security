@@ -11,7 +11,7 @@ export class UploadFilesService {
 
   constructor(private http: HttpClient) { }
 
-  upload(file: File): Observable<HttpEvent<any>> {
+  async upload(file: File): Promise<any> {
 
 
     const formdata: FormData = new FormData();
@@ -22,7 +22,7 @@ export class UploadFilesService {
       reportProgress: true,
       responseType: 'json'});
 
-    return this.http.request(req);
+    return this.http.request(req).toPromise();
   }
 
   getFiles(): Observable<any> {

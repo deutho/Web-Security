@@ -59,7 +59,6 @@ mongoose.connect(
     }).then(
         () => { 
 
-
             this.db = mongoose.connection;
             //report successfull start
             console.log("Connected to Database")},
@@ -74,7 +73,6 @@ app.listen(port, () => {
 
 app.get('/files', async (req, res) => {
     //get all files and send them
-    
     res.send(JSON.stringify(await Model.find()))
 })
 
@@ -97,7 +95,10 @@ app.post('/upload', async (req, res) => {
         })
         
         image_doc.save((err, doc) => {
-            if (err) return console.error(err);
+            if (err) {
+                res.status(500)
+                res.end(JSON.stringify({status:'Database unavailable'}))
+            } 
             res.status(200)
             res.end(JSON.stringify({status:'success'}))
         })

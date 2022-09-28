@@ -40,8 +40,8 @@ export class FileuploadComponent implements OnInit {
       const file: File | null = this.selectedFiles.item(0);
 
       /* check inputed file for validity */
-      if (file &&                                                         //check for null                                 
-          file.size < this.MAX_SIZE &&                                    //check max File Size (1MB)          
+      if (file &&                                                         //check for null
+          file.size < this.MAX_SIZE &&                                    //check max File Size (1MB)
           (file.type === "image/jpeg" || file.type === "image/jpeg") &&   //check for valid filetype (.jpg or .png)
           !file.name.includes("/") &&                                     //check for propably malicious delimiters e.g. “/file.jpg/index.php”
           !file.name.includes(";") &&                                     //check for propably malicious delimiters e.g. “file.asp;.jpg”
@@ -49,34 +49,16 @@ export class FileuploadComponent implements OnInit {
           file.name.length < 34                                           //check if file name is reasonably short
           ) {
         this.currentFile = file;
-        
-        //file seems legit on first inspection so start upload
-        this.uploadService.upload(this.currentFile).subscribe(
-          (event: any) => {
-            //just a Progress bar - now web security related but a nice UX
-            if (event.type === HttpEventType.UploadProgress) {
-              this.progress = Math.round(100 * event.loaded / event.total);
-            } else if (event instanceof HttpResponse) {
-              this.message = event.body.message;
-              this.fileInfos = this.uploadService.getFiles();
-            }
-            //when done uploading clear file and show done message:
-            if(this.progress == 100) {
-              this.currentFile = undefined;
-              this.showMsg("Image successfully uploaded", "success")
-            }
 
-          },
-          (err: any) => {
-            console.log(err);
-            this.progress = 0;
-            if (err.error && err.error.status) {
-              this.showMsg(err.error.status, "error");
-            } else {
-              this.showMsg('Could not upload the file!', "error");
-            }
-            this.currentFile = undefined;
-          });
+        this.uploadService.upload(this.currentFile).then(data => {
+          //on success reload images and show success Message
+          this.fileInfos = this.uploadService.getFiles()
+          this.showMsg("Image successfully uploaded", "success")
+        })
+        .catch(err => {
+          if (err.error.status)  this.showMsg(err.error.status, "error")
+          else this.showMsg("Image Upload Service not available", "error")
+        })
       }
       else {
         //error messages according to detected error
@@ -88,7 +70,7 @@ export class FileuploadComponent implements OnInit {
           !(file.name.indexOf(".", file.name.indexOf(".")+1) != -1) ? '' : this.showMsg("Filename contains too many type declarations: e.g. 'image.pdf.png'", "error");
           file.name.length < 30 ? '' : this.showMsg("name of selected File is too long. Only 30 characters are allowed.", "error");
         }
-        else this.showMsg("no File selected", "error")                                                                                
+        else this.showMsg("no File selected", "error")
       }
       this.selectedFiles = undefined;
     }
@@ -122,6 +104,6 @@ export class FileuploadComponent implements OnInit {
         setTimeout(() => {
           this.message = ''
         }, 5000);
-    }    
+    }
   }
 }

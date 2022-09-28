@@ -3,12 +3,11 @@ const app = express()
 const bodyParser = require("body-parser")
 const multer = require('multer')
 const timeout = require('connect-timeout');
-const jimp = require('jimp')
-const axios = require('axios')
+const sharp = require('sharp')
 
 
 var http = require('http');
-const Jimp = require('jimp');
+
 
 const port = 8080
 let upload = multer()
@@ -41,10 +40,6 @@ var image_magic_strings = {
 app.post('/sanitize', upload.single('file'), async (req, res) => {
     res.setHeader('Content-Type', 'application/json')
     
-
-
-
-
     if (req.file == undefined && req.file == {}) {
         res.status(400)
         res.end(JSON.stringify({status:'No File'}))
@@ -62,82 +57,58 @@ app.post('/sanitize', upload.single('file'), async (req, res) => {
             res.end(JSON.stringify({status:'File violates security measures'}))
         }
 
-
-
         var is_jpg;
 
         //check for mime type with first bytes in hex encoding: https://stackoverflow.com/questions/8473703/in-node-js-given-a-url-how-do-i-check-whether-its-a-jpg-png-gif/8475542#8475542
-        console.log(req.file.buffer)
-
         var magic_number = req.file.buffer.toString('hex', 0, 4);
-        if (magic_number = image_magic_strings.jpg) is_jpg = true;
-        else if (magic_number = image_magic_strings.png) is_jpg = false;
+        if (magic_number == image_magic_strings.jpg) is_jpg = true;
+        else if (magic_number == image_magic_strings.png) is_jpg = false;
         else {
             res.status(400)
-            res.end(JSON.stringify({status:'Only png and jpg allowed'}))
+            res.end(JSON.stringify({status:'Only PNG and JPG files are allowed'}))
         }
 
         if (is_jpg) {
-
-
-
-            //von jpg zu png konvertieren
-            jimp.read(req.file.buffer, function(err, image) {
+            //convert from jpg to png
+            sharp(req.file.buffer).toFile("temp.png", (err, info) => {
                 if (err) {
-                    //TODO Hier den richtigen Error werfen
-                    console.log(err)
+                    global_res.status(500)
+                    global_res.end(JSON.stringify({status:'Error converting the image'}))
                 }
-                else {
-                    image.write("image/test.png")
-                  }
+                sharp("temp.png").toBuffer().then(data =>  {
+                    post_image(data, req.file.originalname.slice(0, -3)+"png", res)
+                })
             })
-
-
-                    
-            jimp.read("image/test.png", function(err, image_png) {
-                if (err) {
-                    //TODO Hier den richtigen Error werfen
-                    console.log("readerror: "+err)
-                }
-                else {
-                    console.log(image_png)
-                    post_image(image_png, req.file.originalname, res)
-                    console.log(image_png.bitmap.data.toString('hex', 0, 4));
-                    console.log(image.getExtension())
-                }
-            })
-         
-
         }
 
         else {
-            //von png zu jpg konvertieren
+            //convert from png to jpg
+            sharp(req.file.buffer).toFile("temp.jpg", (err, info) => {
+                if (err) {
+                    global_res.status(500)
+                    global_res.end(JSON.stringify({status:'Error converting the image'}))
+                }
+                sharp("temp.jpg").toBuffer().then(data =>  {
+                    console.log(data)
+                    post_image(data, req.file.originalname.slice(0, -3)+"jpg", res)
+                })
+            })
         }
     }
 });
 
 
-function post_image(image, filename, res) {
+async function post_image(image, filename,  global_res) {
 
         //convert image to base64 from image buffer
-        var base64 = Buffer.from(image.bitmap.data).toString("base64")
+        var base64 = Buffer.from(image).toString("base64")
         
         //check for multiple encodings to hide attack payload
         if (base64.substring(0,4) !== "Vm0wd") {
 
             //here send data to the frontend to store
-
             /*send to backend and forward status */
             payload = JSON.stringify({data: base64, filename: filename})
-
-
-            // axios.post('http://localhost:8081/upload', payload).then(res => {
-
-            // })
-            // .catch(error => {
-            //     //TODO throw meaningful error
-            //     console.log(error);
-            // });
 
 
             //An object of options to indicate where to post to
@@ -156,26 +127,32 @@ function post_image(image, filename, res) {
             var post_req = http.request(post_options, function(res) {
                 res.setEncoding('utf8');
                 res.on('data',  (chunk) => {
-                    console.log('Response: ' + chunk);
+                    global_res.setHeader('Content-Type', 'application/json')
+                    global_res.status(200)
+                    global_res.end(JSON.stringify({status:'success'}))
                 });
+
             });
 
-            //post data
-            post_req.write(payload);
-            post_req.end();
+            post_req.on('error', (error) => {
+                global_res.status(503)
+                global_res.end(JSON.stringify({status:'Error saving the image - please try again later'}))
+            });
 
-            res.setHeader('Content-Type', 'application/json')
-            res.status(200)
-            res.end(JSON.stringify({status:'success'}))
+            
+            //post data and send the request
+            post_req.write(payload);
+            post_req.end()
+
+            
 
         } else {
             res.status(400)
-            res.end(JSON.stringify({status:'Unsecure Base64 String'}))
-        } 
-       
+            res.end(JSON.stringify({status:'Unsecure Image Encoding'}))
+        }  
 }
 
 
 app.listen(port, () => {
-    console.log('Middleware started!')
+    console.log('Sanitizing Service started!')
 })
