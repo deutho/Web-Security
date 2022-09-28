@@ -94,7 +94,7 @@ app.post('/sanitize', upload.single('file'), async (req, res) => {
 
 
                     
-            // jimp.read("image/test.png", function(err, image_png) {
+            jimp.read("image/test.png", function(err, image_png) {
                 if (err) {
                     //TODO Hier den richtigen Error werfen
                     console.log("readerror: "+err)
