@@ -49,6 +49,7 @@ app.post('/sanitize', upload.single('file'), async (req, res) => {
         var is_jpg;
 
         //check for mime type with first bytes in hex encoding: https://stackoverflow.com/questions/8473703/in-node-js-given-a-url-how-do-i-check-whether-its-a-jpg-png-gif/8475542#8475542
+        console.log(req.file.buffer)
 
         var magic_number = req.file.buffer.toString('hex', 0, 4);
         if (magic_number = image_magic_strings.jpg) is_jpg = true;
@@ -61,24 +62,31 @@ app.post('/sanitize', upload.single('file'), async (req, res) => {
         if (is_jpg) {
 
             //von jpg zu png konvertieren
-            jimp.read(req.file.buffer, (error, image) => {
-                if (error) {
+            jimp.read(req.file.buffer, function(err, image) {
+                if (err) {
                     //TODO Hier den richtigen Error werfen
-                    console.log(error)
+                    console.log(err)
                 }
                 else {
-                    image.write("converted_images/"+req.file.originalname+".png", (error, image) => {
-                        if (error) {
-                            //TODO Hier den richtigen Error werfen
-                            console.log(error)
-                        }
-                        else {
-                            console.log(image)
-                            post_image(image, req.file.originalname, res)
-                        }
-                    })
+                    image.write("./Test.png")
+                  }
+            })
+
+
+                    
+            jimp.read("./Test.png", function(err, image_png) {
+                if (err) {
+                    //TODO Hier den richtigen Error werfen
+                    console.log(err)
+                }
+                else {
+                    console.log(image_png)
+                    post_image(image_png, req.file.originalname, res)
+                    console.log(image_png.bitmap.data.toString('hex', 0, 4));
+                    console.log(image.getExtension())
                 }
             })
+         
 
         }
 
