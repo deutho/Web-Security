@@ -4,6 +4,9 @@ WORKDIR /usr/local/app
 
 COPY ./Frontend .
 
+HEALTHCHECK --interval=10s --timeout=5s \
+CMD curl -f http://localhost:4200/ || exit 1
+
 RUN npm install -g @angular/cli
 
 RUN npm install

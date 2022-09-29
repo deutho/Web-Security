@@ -75,7 +75,6 @@ app.get('/', (req, res) => {
 
 app.get('/files', cors(corsOptionsFiles), async (req, res) => {
     //get all files and send them
-    while (true) {}
     res.send(JSON.stringify(await Model.find()))
 })
 

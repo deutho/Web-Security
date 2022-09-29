@@ -3,7 +3,7 @@ FROM node:latest
 WORKDIR /usr/scr/app
 COPY ./SanitizingService/package*.json ./
 HEALTHCHECK --interval=10s --timeout=5s \
-CMD curl -f http://localhost:8081/ || exit 1
+CMD curl -f http://localhost:8080/ || exit 1
 RUN npm install
 COPY ./SanitizingService .
 EXPOSE 8080
