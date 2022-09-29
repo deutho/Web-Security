@@ -12,7 +12,7 @@ export class FileuploadComponent implements OnInit {
   /***CONSTANTS AND VARIABLES***/
   selectedFiles?: FileList;
   currentFile?: File;
-  progress = 0;
+  loading = false;
   message = '';
   successMessage = '';
   errorMessage = '';
@@ -43,7 +43,6 @@ export class FileuploadComponent implements OnInit {
    * Upload the selected file
    */
   upload(){
-    this.progress = 0;
 
     if (this.selectedFiles) {
       //select only one file in case of multi file upload attempt
@@ -60,8 +59,10 @@ export class FileuploadComponent implements OnInit {
           ) {
         this.currentFile = file;
 
+        this.loading = true;
         this.uploadService.upload(this.currentFile).then(data => {
           //on success reload images and show success Message
+          this.loading = false;
           this.fileInfos = this.uploadService.getFiles()
           this.showMsg("Image successfully uploaded", "success")
         })

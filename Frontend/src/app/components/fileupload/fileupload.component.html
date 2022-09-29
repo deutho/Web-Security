@@ -19,6 +19,13 @@
   <div *ngIf="successMessage" class="alert alert-success" role="alert"> {{successMessage}} </div>
   <div *ngIf="errorMessage" class="alert alert-danger" role="alert"> {{errorMessage}} </div>
 
+  <!-- Spinner -->
+  <div style = "display: flex; justify-content: center; align-items: center; margin-top: 5px;">
+    <div *ngIf="loading" class="spinner-border" role="status">
+
+    </div>
+  </div>
+
   <!-- Images of DB -->
   <div class="card mt-3">
     <div class="card-header">List of Images</div>
