@@ -4,6 +4,7 @@ const bodyParser = require("body-parser")
 const multer = require('multer')
 const timeout = require('connect-timeout');
 const sharp = require('sharp')
+const cors = require('cors')
 
 
 var http = require('http');
@@ -13,16 +14,19 @@ const port = 8080
 let upload = multer()
 const MAX_SIZE = 1048576;   // Maximum file size allowed to be uploaded = 1MB
 
+
 app.use(timeout('20s')); //set 20s timeout for all requests
 
-//CORS Headers
-app.use(function(req, res, next) {
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
-    res.setHeader('Access-Control-Allow-Methods', 'GET');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    next();
-});
+//enable pre-flight requests for sanitize route
+app.options('/sanitize', cors())
+
+//cors options
+var corsOptions = {
+    origin: 'http://localhost:4200',
+    methods: ['POST'],
+    allowedHeaders: ['Content-Type'],
+    crededtials: true
+}
 
 //Parse the Request Body with 5mb size limit
 app.use(bodyParser.json({limit: '5mb'}))
@@ -35,9 +39,7 @@ var image_magic_strings = {
 };
 
 
-
-
-app.post('/sanitize', upload.single('file'), async (req, res) => {
+app.post('/sanitize', cors(corsOptions), upload.single('file'), async (req, res) => {
     res.setHeader('Content-Type', 'application/json')
     
     if (req.file == undefined && req.file == {}) {

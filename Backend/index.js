@@ -3,6 +3,7 @@ const app = express()
 const mongoose = require("mongoose")
 const bodyParser = require("body-parser")
 const timeout = require('connect-timeout');
+const cors = require('cors')
 
 const username = process.env.DB_USERNAME
 const password = process.env.DB_PASSWORD
@@ -15,25 +16,22 @@ var db;
 
 app.use(timeout('20s')); //set 20s timeout for all requests
 
-//CORS Headers
-app.use(function(req, res, next) {
 
-    const corsWhiteList =  ['http://localhost:8080', 'http://localhost:4200']; //accepted origins --> Frontend and Middleware
+//cors options upload
+var corsOptionsUpload = {
+    origin: 'http://localhost:8080',
+    methods: ['POST'],
+    allowedHeaders: ['Content-Type'],
+    crededtials: true
+}
 
-    if (corsWhiteList.includes(req.headers.origin))  { //origin has valid index in the whitelist array
-        res.setHeader('Access-Control-Allow-Origin', req.headers.origin); //add URL to the Header
-        
-    } else {
-        res.setHeader('Access-Control-Allow-Origin', ''); //don't provide the CORS Origin Header
-    }
-    
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    
-    
-    next();
-});
+//cors options get files
+var corsOptionsFiles = {
+    origin: 'http://localhost:4200',
+    methods: ['GET'],
+    allowedHeaders: ['Content-Type'],
+    crededtials: true
+}
 
 //Parse the Request Body
 
@@ -71,12 +69,12 @@ app.listen(port, () => {
     console.log('Backend started!')
 })
 
-app.get('/files', async (req, res) => {
+app.get('/files', cors(corsOptionsFiles), async (req, res) => {
     //get all files and send them
     res.send(JSON.stringify(await Model.find()))
 })
 
-app.post('/upload', async (req, res) => {
+app.post('/upload', cors(corsOptionsUpload), async (req, res) => {
     res.setHeader('Content-Type', 'application/json')
     
     if (req.body == undefined || req.body == {}) {
