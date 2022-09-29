@@ -2,25 +2,22 @@ const express = require('express')
 const app = express()
 const bodyParser = require("body-parser")
 const multer = require('multer')
+const upload = multer()
 const timeout = require('connect-timeout');
 const sharp = require('sharp')
 const cors = require('cors')
+const http = require('http');
 
-
-var http = require('http');
-
-
+/* CONSTANTS */
 const port = 8080
-let upload = multer()
 const MAX_SIZE = 1048576;   // Maximum file size allowed to be uploaded = 1MB
 
 
-app.use(timeout('20s')); //set 20s timeout for all requests
+/* ***API OPTIONS (Body Parser, CORS, Timeout)*** */
+app.use(timeout('20s'));
 
-//enable pre-flight requests for sanitize route
-app.options('/sanitize', cors())
+app.options('/sanitize', cors()) //Allow pre flight request on this route
 
-//cors options
 var corsOptions = {
     origin: 'http://localhost:4200',
     methods: ['POST'],
@@ -28,21 +25,27 @@ var corsOptions = {
     crededtials: true
 }
 
-//Parse the Request Body with 5mb size limit
 app.use(bodyParser.json({limit: '5mb'}))
 app.use(bodyParser.urlencoded({limit: '5mb', extended: true }));
 
 
+/* ***Samples of first chars of Buffer to identify file types based on raw data*** */
 var image_magic_strings = {
     jpg: 'ffd8ffe0',
     png: '89504e47'
 };
 
-
+/**
+ * Health checker route
+ */
 app.get('/', (req, res) => {
     res.status(200).send('ok')
 })
 
+/**
+ * Sanitization route
+ * CORS Policy - only reachable from the frontend
+ */
 app.post('/sanitize', cors(corsOptions), upload.single('file'), async (req, res) => {
     res.setHeader('Content-Type', 'application/json')
     
@@ -74,8 +77,11 @@ app.post('/sanitize', cors(corsOptions), upload.single('file'), async (req, res)
             res.end(JSON.stringify({status:'Only PNG and JPG files are allowed'}))
         }
 
+        /**
+         * Library sharp is used to convert the image from png to jpg and vice versa
+         */
+
         if (is_jpg) {
-            //convert from jpg to png
             sharp(req.file.buffer).toFile("temp.png", (err, info) => {
                 if (err) {
                     global_res.status(500)
@@ -88,7 +94,6 @@ app.post('/sanitize', cors(corsOptions), upload.single('file'), async (req, res)
         }
 
         else {
-            //convert from png to jpg
             sharp(req.file.buffer).toFile("temp.jpg", (err, info) => {
                 if (err) {
                     global_res.status(500)
@@ -103,7 +108,12 @@ app.post('/sanitize', cors(corsOptions), upload.single('file'), async (req, res)
     }
 });
 
-
+/**
+ * Helper function to post the image to the database in base64
+ * @param {*} image The image itself as buffer
+ * @param {*} filename The filename of the image
+ * @param {*} global_res The response element
+ */
 async function post_image(image, filename,  global_res) {
 
         //convert image to base64 from image buffer
@@ -158,7 +168,9 @@ async function post_image(image, filename,  global_res) {
         }  
 }
 
-
+/**
+ * Starting up the Express Server
+ */
 app.listen(port, () => {
     console.log('Sanitizing Service started!')
 })

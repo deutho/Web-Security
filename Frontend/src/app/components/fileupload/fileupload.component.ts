@@ -1,4 +1,3 @@
-import { HttpEventType, HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { UploadFilesService } from 'src/app/services/file-upload.service';
@@ -10,6 +9,7 @@ import { UploadFilesService } from 'src/app/services/file-upload.service';
 })
 export class FileuploadComponent implements OnInit {
 
+  /***CONSTANTS AND VARIABLES***/
   selectedFiles?: FileList;
   currentFile?: File;
   progress = 0;
@@ -17,21 +17,31 @@ export class FileuploadComponent implements OnInit {
   successMessage = '';
   errorMessage = '';
   MAX_SIZE: number = 1048576;   // Maximum file size allowed to be uploaded = 1MB
-
   fileInfos?: Observable<any>;
-
   image: string = ""
+
+
   constructor(private uploadService: UploadFilesService) { }
 
+
+  /**
+   * Query existing Images on Lifecycle Hook OnInit
+   */
   ngOnInit(): void {
     this.fileInfos = this.uploadService.getFiles();
   }
 
+  /**
+   * Function to select an Image to be uploaded
+   * @param event
+   */
   selectFile(event: any): void {
     this.selectedFiles = event.target.files;
   }
 
-  /* upload the selected File */
+  /**
+   * Upload the selected file
+   */
   upload(){
     this.progress = 0;
 
@@ -56,8 +66,8 @@ export class FileuploadComponent implements OnInit {
           this.showMsg("Image successfully uploaded", "success")
         })
         .catch(err => {
-          if (err.error.status)  this.showMsg(err.error.status, "error")
-          else this.showMsg("Image Upload Service not available", "error")
+          if (err.error.status)  this.showMsg(err.error.status, "error") //Display the Error provided from the Backend
+          else this.showMsg("Image Upload Service not available", "error") //Display Connection Error
         })
       }
       else {
@@ -76,7 +86,9 @@ export class FileuploadComponent implements OnInit {
     }
   }
 
-  /* Messages for Usernotification */
+  /**
+   * Messages for Usernotification
+   */
   showMsg(message: string, type: String){
     //errormsg
     if(type === "error") {

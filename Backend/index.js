@@ -5,19 +5,16 @@ const bodyParser = require("body-parser")
 const timeout = require('connect-timeout');
 const cors = require('cors')
 
+/****CONSTANTS*** */
 const username = process.env.DB_USERNAME
 const password = process.env.DB_PASSWORD
-
 const MongoDB_URI = "mongodb://"+username+":"+password+"@mongodb:27017"
-
 const port = 8081
-var schema;
-var db;
-
-app.use(timeout('20s')); //set 20s timeout for all requests
 
 
-//cors options upload
+/* ***API OPTIONS (Body Parser, CORS, Timeout)*** */
+app.use(timeout('20s')); 
+
 var corsOptionsUpload = {
     origin: 'http://localhost:8080',
     methods: ['POST'],
@@ -25,7 +22,6 @@ var corsOptionsUpload = {
     crededtials: true
 }
 
-//cors options get files
 var corsOptionsFiles = {
     origin: 'http://localhost:4200',
     methods: ['GET'],
@@ -33,14 +29,12 @@ var corsOptionsFiles = {
     crededtials: true
 }
 
-//Parse the Request Body
-
 app.use(bodyParser.json({limit: '5mb'}))
 app.use(bodyParser.urlencoded({limit: '5mb', extended: true }));
 
-//Connect to the Database
 
-//build schema for DB and set Model
+
+/* ***DATABASE SCHEMA AND CONNECTION*** */
 this.schema = mongoose.Schema({
     "name": String,
     "timeStamp": Number,
@@ -65,19 +59,35 @@ mongoose.connect(
         }
     );
 
+
+
+/**
+ * Starting up the Express Server
+ */
 app.listen(port, () => {
     console.log('Backend started!')
 })
 
+/**
+ * Health check route
+ */
 app.get('/', (req, res) => {
     res.status(200).send('ok')
 })
 
+/**
+ * Return all the files in the database 
+ * CORS Policy - only reachable by the frontend
+ */
 app.get('/files', cors(corsOptionsFiles), async (req, res) => {
-    //get all files and send them
     res.send(JSON.stringify(await Model.find()))
 })
 
+
+/**
+ * Upload Endpoint to store images in the database
+ * CORS Policy - only reachable by the sanitization service
+ */
 app.post('/upload', cors(corsOptionsUpload), async (req, res) => {
     res.setHeader('Content-Type', 'application/json')
     
@@ -86,7 +96,6 @@ app.post('/upload', cors(corsOptionsUpload), async (req, res) => {
         res.end(JSON.stringify({status:'No File'}))
     }
     else {
-        //store to mongoDB and send success
         body = req.body.data
         filename = req.body.filename
 
