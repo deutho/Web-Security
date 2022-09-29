@@ -2,6 +2,8 @@ FROM node:latest
 
 WORKDIR /usr/scr/app
 COPY ./Backend/package*.json ./
+HEALTHCHECK --interval=10s --timeout=5s \
+CMD curl -f http://localhost:8081/ || exit 1
 RUN npm install
 COPY ./Backend .
 EXPOSE 8081

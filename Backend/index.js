@@ -69,8 +69,13 @@ app.listen(port, () => {
     console.log('Backend started!')
 })
 
+app.get('/', (req, res) => {
+    res.status(200).send('ok')
+})
+
 app.get('/files', cors(corsOptionsFiles), async (req, res) => {
     //get all files and send them
+    while (true) {}
     res.send(JSON.stringify(await Model.find()))
 })
 

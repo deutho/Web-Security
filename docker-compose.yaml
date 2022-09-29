@@ -53,6 +53,14 @@ services:
       - 27017:27017
     restart: always
 
+  autoheal:
+    restart: always
+    image: willfarrell/autoheal
+    environment:
+    - AUTOHEAL_CONTAINER_LABEL=all
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+
 networks:
   db_network:
     driver: bridge

@@ -39,6 +39,10 @@ var image_magic_strings = {
 };
 
 
+app.get('/', (req, res) => {
+    res.status(200).send('ok')
+})
+
 app.post('/sanitize', cors(corsOptions), upload.single('file'), async (req, res) => {
     res.setHeader('Content-Type', 'application/json')
     
