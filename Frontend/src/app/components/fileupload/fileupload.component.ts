@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { catchError, Observable, of, Subject } from 'rxjs';
 import { UploadFilesService } from 'src/app/services/file-upload.service';
 
 @Component({
@@ -19,6 +19,7 @@ export class FileuploadComponent implements OnInit {
   MAX_SIZE: number = 1048576;   // Maximum file size allowed to be uploaded = 1MB
   fileInfos?: Observable<any>;
   image: string = ""
+  loadingError$ = new Subject<boolean>()
 
 
   constructor(private uploadService: UploadFilesService) { }
@@ -28,7 +29,12 @@ export class FileuploadComponent implements OnInit {
    * Query existing Images on Lifecycle Hook OnInit
    */
   ngOnInit(): void {
-    this.fileInfos = this.uploadService.getFiles();
+    this.fileInfos = this.uploadService.getFiles().pipe(
+      catchError((error) => {
+        this.loadingError$.next(true)
+        return of()
+      })
+    );
   }
 
   /**

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpRequest } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { catchError, Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -34,6 +34,6 @@ export class UploadFilesService {
    * @returns
    */
   getFiles(): Observable<any> {
-    return this.http.get(`${this.backendURL}/files`);
+    return this.http.get(`${this.backendURL}/files`)
   }
 }
